@@ -1,108 +1,76 @@
 ﻿using System;
-using System.Data;
-using MySql.Data.MySqlClient;
+using System.Numerics;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace DotNetCore2
 {
-    class Student
-    {
-        private int _id;
-        private string _name;
-        private string _email;
-
-        public int Id { get => _id; set => _id = value; }
-        public string Name { get => _name; set => _name = value; }
-        public string Email { get => _email; set => _email = value; }
-    }
-
-    class Employee
-    {
-        private int _id;
-        private string _name;
-        private string _email;
-        private float _salary;
-
-        public int Id { get => _id; set => _id = value; }
-        public string Name { get => _name; set => _name = value; }
-        public string Email { get => _email; set => _email = value; }
-        public float Salary { get => _salary; set => _salary = value; }
-    }
-
     class Program
     {
-
-        static void PrintInfo(Tuple<int, string, string> obj)
-        {
-            Console.WriteLine( obj.Item1 + " - " + obj.Item2 + ": " + obj.Item3 );
-        }
-        /*
-        static void PrintInfo(int id, string name, string email, float salary, 
-            string dob, string address, string KPIcalculation_classLibrary_Helper_shortTitleForUser, string gender)
-        {
-            Console.WriteLine(id + " - " + name + ": " + email);
-        }
-        */
         static void Main(string[] args)
         {
-            PrintInfo(Tuple.Create( 101, "Mark", "mark@gmail.com" ));
+            string d = "ApPlE"; // 789 654 133 000 111 222 
+            // Console.WriteLine(Regex.IsMatch(d, @"^apple$", RegexOptions.IgnoreCase));
 
-            Student s1 = new Student() { Id = 102, Name = "John", Email = "" };
-            Employee e1 = new Employee() { Id = 103, Name = "Mike", Email = "mike@gmail.com" };
+            d = "123-4567";
+            Console.WriteLine(Regex.IsMatch(d, @"^\d{3}-\d{4}$"));
 
-            PrintInfo(Tuple.Create(s1.Id, s1.Name, s1.Email));
+            d = "(204) 123-4567";
+            Console.WriteLine(Regex.IsMatch(d, @"^\(\d{3}\) \d{3}-\d{4}$"));
 
-            string cs = 
-                @"server=localhost;userid=root;password=;database=sql_classes";
+            d = "mike.zorin@gmail.commm";
+            Console.WriteLine(Regex.IsMatch(d, @"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"));
 
-            // MySqlConnection conn = new MySqlConnection(cs);
-            // conn.ConnectionString = cs;
+            d = "1324578945613245678946134865446132";
+            Console.WriteLine("Digits only = " + Regex.IsMatch(d, @"^\d*$"));
 
-            using (MySqlConnection conn = new MySqlConnection(cs))
+
+            string re = @"^[ a-zA-Z0-9]*$";
+            Console.WriteLine( IsValid("Robertson college 1657", re) );
+
+            re = @"^[a-z]+$";
+            // . 
+            Console.WriteLine(IsValid("a", re));
+
+            re = @"^..$";
+            Console.WriteLine("for . = " + IsValid("%@", re));
+
+            // ? 
+            re = @"^[1-5]?$";
+            Console.WriteLine("for ? = " + IsValid("", re));
+
+            // var key = Console.ReadKey();
+
+            string str = "4 and 5";
+
+            Match m = Regex.Match(str, @"\d");
+
+            if (m.Success)
             {
-                conn.Open();
-                Console.WriteLine(conn.ServerVersion);
-
-                string stm = "select version()";
-                MySqlCommand cmd = new MySqlCommand(stm, conn);
-                var res = cmd.ExecuteScalar(); //.ToString();
-
-                Console.WriteLine(res);
-
-                stm = "select * from people";
-                cmd = new MySqlCommand(stm, conn);
-
-                MySqlDataReader rdr = cmd.ExecuteReader();
-                
-                // ADO.net : CRUD
-                while (rdr.Read())
-                {
-                    Console.WriteLine( "{0} \t {1}", rdr.GetString(0), rdr.GetString(1));
-                }
-
+                Console.WriteLine(m.Value);
             }
 
-            /*
-            try
-            {
-                conn.Open();
-                Console.WriteLine(conn.ServerVersion);
+            m = m.NextMatch();
 
-                string stm = "select version()";
-                MySqlCommand cmd = new MySqlCommand(stm, conn);
-                string res = cmd.ExecuteScalar().ToString();
-
-                Console.WriteLine(res);
-
-            }
-            catch (Exception e)
+            if (m.Success)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine(m.Value);
             }
-            finally
-            {
-                conn.Close();
-            }
-            */
+
+
+            str = "HELLO";
+            string res = str.FlipFirstLetterCase();
+
+            Console.WriteLine(res);
+
+
+            BigInteger i = new BigInteger();
+            i.ToWords();
+        }
+
+        static bool IsValid(string value, string re)
+        {
+            return Regex.IsMatch(value, re);
         }
     }
 }
