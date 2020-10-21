@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Numerics;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 
 namespace DotNetCore2
 {
@@ -9,68 +6,108 @@ namespace DotNetCore2
     {
         static void Main(string[] args)
         {
-            string d = "ApPlE"; // 789 654 133 000 111 222 
-            // Console.WriteLine(Regex.IsMatch(d, @"^apple$", RegexOptions.IgnoreCase));
+            // ConsoleKeyInfo cki = Console.ReadKey();
 
-            d = "123-4567";
-            Console.WriteLine(Regex.IsMatch(d, @"^\d{3}-\d{4}$"));
-
-            d = "(204) 123-4567";
-            Console.WriteLine(Regex.IsMatch(d, @"^\(\d{3}\) \d{3}-\d{4}$"));
-
-            d = "mike.zorin@gmail.commm";
-            Console.WriteLine(Regex.IsMatch(d, @"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"));
-
-            d = "1324578945613245678946134865446132";
-            Console.WriteLine("Digits only = " + Regex.IsMatch(d, @"^\d*$"));
-
-
-            string re = @"^[ a-zA-Z0-9]*$";
-            Console.WriteLine( IsValid("Robertson college 1657", re) );
-
-            re = @"^[a-z]+$";
-            // . 
-            Console.WriteLine(IsValid("a", re));
-
-            re = @"^..$";
-            Console.WriteLine("for . = " + IsValid("%@", re));
-
-            // ? 
-            re = @"^[1-5]?$";
-            Console.WriteLine("for ? = " + IsValid("", re));
-
-            // var key = Console.ReadKey();
-
-            string str = "4 and 5";
-
-            Match m = Regex.Match(str, @"\d");
-
-            if (m.Success)
+            /*
+            if (cki.Key == ConsoleKey.Enter)
             {
-                Console.WriteLine(m.Value);
+                Console.WriteLine("Enter key has been pressed");
+            }
+            if (cki.Key == ConsoleKey.Escape)
+            {
+                Console.WriteLine("Esc key has been pressed");
+            }
+            */
+
+            // Reflaction
+            // Type T = Type.GetType("DotNetCore2.Customer");
+            Type T = typeof(DotNetCore2.Customer);
+            // Type T = typeof(System.Object);
+
+            var propsInfo = T.GetProperties();
+
+            foreach (var p in propsInfo)
+            {
+                Console.WriteLine(p.Name + "  " + p.PropertyType.Name);
             }
 
-            m = m.NextMatch();
+            Console.WriteLine("---------------------------------------------------------");
 
-            if (m.Success)
+            var methodsInfo = T.GetMethods();
+
+            foreach (var m in methodsInfo)
             {
-                Console.WriteLine(m.Value);
+                Console.WriteLine(m.Name + " returns " + m.ReturnType.Name);
+            }
+
+            Console.WriteLine("---------------------------------------------------------");
+
+            var fieldsInfo = T.GetFields();
+
+            foreach (var f in fieldsInfo)
+            {
+                Console.WriteLine(f.Name + " " + f.FieldType + " " + f.IsStatic);
+            }
+
+            Console.WriteLine("---------------------------------------------------------");
+
+            var ctorsInfo = T.GetConstructors();
+
+            foreach (var ct in ctorsInfo)
+            {
+                Console.WriteLine( ct );
             }
 
 
-            str = "HELLO";
-            string res = str.FlipFirstLetterCase();
+            Console.WriteLine("---------------------------------------------------------");
 
-            Console.WriteLine(res);
+            Customer c = new Customer(101, "John", "ddd@ddd.com");
 
-
-            BigInteger i = new BigInteger();
-            i.ToWords();
+            Console.WriteLine(c.ToString());
         }
+    }
 
-        static bool IsValid(string value, string re)
+    class Customer
+    {
+        private int _id;
+        private string _name;
+        private string _email;
+
+        internal protected static string email2;
+        public string email3;
+
+        public Customer()
         {
-            return Regex.IsMatch(value, re);
         }
+
+        public Customer(int id, string name, string email)
+        {
+            _id = id;
+            _name = name;
+            _email = email;
+        }
+
+        public int Id { get => _id; set => _id = value; }
+        public string Name { get => _name; set => _name = value; }
+        public string Email { get => _email; set => _email = value; }
+
+        public void PrintId()
+        {
+            Console.WriteLine(Id);
+        }
+        public void PrintInfo()
+        {
+            Console.WriteLine(Id + ": " + Name + " " + Email);
+        }
+        public void PrintInfo3()
+        {
+            Console.WriteLine(Id + ": " + Name + " " + Email);
+        }
+        
+        public override string ToString()
+        {
+            return Id + ": " + Name + " " + Email;
+        }
+        
     }
 }
