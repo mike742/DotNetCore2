@@ -17,6 +17,8 @@ namespace DotNetCore2
             list.Add(new Student() { Id = 101, Name = "Lucy", TotalMarks = 1020 });
             list.Add(new Student() { Id = 102, Name = "Mark", TotalMarks = 1008 });
             list.Add(new Student() { Id = 103, Name = "Rosy", TotalMarks = 1025 });
+            list.Add(new Student() { Id = 104, Name = "John", TotalMarks = 1012 });
+            list.Add(new Student() { Id = 105, Name = "Mike", TotalMarks = 1016 });
 
             return list;
         }
