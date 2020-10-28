@@ -22,5 +22,10 @@ namespace DotNetCore2
 
             return list;
         }
+
+        public override string ToString()
+        {
+            return $"{Id}: {Name} {TotalMarks}";
+        }
     }
 }

@@ -7,114 +7,124 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.Xml;
+using System.Security.Cryptography;
 
 namespace DotNetCore2
 {
     class Program
     {
-        private static void AddText(FileStream fs, string value)
-        {
-            byte[] info = new UTF8Encoding(true).GetBytes(value);
-            fs.Write(info, 0, info.Length);
-        }
-
         static void Main(string[] args)
         {
-            string path = @"d:\temp\text.json";
-            string jsonString = File.ReadAllText(path);
-            var res2 = JsonSerializer.Deserialize<Top>(jsonString);
-            
-            Console.WriteLine("=============================================================");
-            /*
-            Console.WriteLine(res2.menu.header);
-            foreach (var i in res2.menu.items)
+            string path2 = "Menu2.xml";
+            if (File.Exists("Menu2.xml"))
             {
-                if (i != null)
+                Console.WriteLine("The file exists!");
+            }
+
+            string path = @"c:\programs\file.txt";
+
+            Console.WriteLine(Path.GetFullPath(path2));
+            Console.WriteLine(Path.GetFileName(path));
+            Console.WriteLine(Path.GetFileNameWithoutExtension(path) + ".xml");
+            Console.WriteLine(Path.GetExtension(path));
+
+            Console.WriteLine("==============================================");
+
+            int[] numbers = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+            // IEnumerable<int> res = numbers.Where(n => n % 2 == 0).Select(n => n);
+
+            var res = numbers.Where(n => n % 2 == 0);//.Select(n => n);
+
+            var res2 = from i in numbers
+                       where i % 2 == 0
+                       select i;
+
+            var list1 = Student.LoadData().Where(s => s.TotalMarks > 1010)
+                                .Select(s => s.Id + " " + s.Name + " " + s.TotalMarks);
+
+            var list2 = from s in Student.LoadData()
+                        where s.TotalMarks > 1010
+                        select s;
+
+            foreach (var s in res)
+            {
+                Console.WriteLine(s);
+            }
+
+            Console.WriteLine( "=======================================" );
+            Console.WriteLine( numbers.Max() );
+            Console.WriteLine( numbers.Min() );
+
+            Console.WriteLine( numbers.Where(n => n % 2 == 0).Min() );
+            Console.WriteLine( numbers.Where(n => n % 2 == 0).Max() );
+
+            Console.WriteLine(numbers.Sum());
+            Console.WriteLine(numbers.Count());
+            Console.WriteLine(numbers.Average());
+
+            string[] countries = { "Canada", "Usa", "Uk", "India", "Ukraine" };
+            Console.WriteLine(countries.Min( c => c.Length ));
+            Console.WriteLine(countries.Max( c => c.Length));
+
+            var ls = new List<Shape>
+            {
+                new Circle { Color = "Red", R = 2.5},
+                new Rectangle { Color = "Blue", H = 20, W = 10 },
+                new Circle { Color = "Green", R = 8},
+                new Circle { Color = "Grey", R = 12.3},
+                new Rectangle { Color = "Blue", H = 45, W = 18 }
+            };
+
+            foreach (var s in ls)
+            {
+                Console.WriteLine( s.GetType().Name + " " +  s.Color + " " + s.Area);
+            }
+
+            var xs = new XmlSerializer( typeof(List<Shape>) );
+            string pathXML = "Shapes.xml";
+
+            using (FileStream fs = File.Create(pathXML))
+            {
+                xs.Serialize(fs, ls);
+            }
+
+
+            using (StringReader sr = new StringReader( File.ReadAllText( pathXML ) ))
+            {
+                var res22 = xs.Deserialize(sr) as List<Shape>;
+
+                foreach (var s in res22)
                 {
-                    Console.Write("\t id = " + i.id);
-
-                    if (i.label != null)
-                        Console.Write("; label = " + i.label);
-
-                    Console.WriteLine();
+                    Console.WriteLine(s.Color + " " + s.Area);
                 }
-                else
-                    Console.WriteLine("\t null");
-            }
-            */
-
-            /*
-            XDocument xmlDoc = new XDocument(
-                    new XDeclaration("1.0", "utf-8", "yes"),
-                    // new XComment("Creating xml file using linq to xml"),
-                    new XElement("Students",
-                        new XElement("Student", 
-                                new XAttribute("Id", 101),
-                                new XElement("Name", "Lucy"),
-                                new XElement("TotalMarks", 850)
-                            ),
-                        new XElement("Student", 
-                                new XAttribute("Id", 102),
-                                new XElement("Name", "Mark"),
-                                new XElement("TotalMarks", 1020)
-                            ),
-                        new XElement("Student",
-                                new XAttribute("Id", 103),
-                                new XElement("Name", "Rosy"),
-                                new XElement("TotalMarks", 1015)
-                            )
-                    )
-                );
-            */
-            //XDocument xmlDoc = new XDocument(
-            //       new XDeclaration("1.0", "utf-8", "yes"),
-            //       // new XComment("Creating xml file using linq to xml"),
-            //       new XElement("Students",
-            //           Student.LoadData()
-            //                .Select(s => new XElement("Student",
-            //                    new XAttribute("Id", s.Id),
-            //                    new XElement("Name", s.Name),
-            //                    new XElement("TotalMarks", s.TotalMarks)
-            //                ))
-            //       )
-            //   ); xmlDoc.Save(@"d:\temp\Example.xml");
-
-            XDocument xmlDoc = new XDocument(
-                   new XElement("menu",
-                        new XElement("header", "Adobe " + res2.menu.header),
-                        res2.menu.items
-                            .Select(i => i != null ? 
-                                new XElement("item", 
-                                    new XAttribute("action", i.id),
-                                    new XAttribute("id", i.id),
-                                        i.label != null ?
-                                            i.label : i.id
-                                ) :
-                                new XElement("separator")
-                            )
-                   )
-                   
-               );
-            // <input value="" />
-            xmlDoc.Save(@"d:\temp\Menu.xml");
-
-            Console.WriteLine(ToXml(res2));
-        }
-
-        static string ToXml<T>(T obj)
-        {
-            using (StringWriter sw = new StringWriter(new StringBuilder()))
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(T));
-                serializer.Serialize(sw, obj);
-
-                return sw.ToString();
             }
         }
-
     }
 
-    
+    [XmlInclude(typeof(Circle))]
+    [XmlInclude(typeof(Rectangle))]
+    public class Shape
+    {
+        public string Color { get; set; }
+        public virtual double Area { get; }
+    }
+
+    public class Circle : Shape
+    {
+        public double R { set; get; }
+        public override double Area => Math.PI * Math.Pow(R, 2);
+    }
+
+    public class Rectangle : Shape
+    {
+        public double H { set; get; }
+        public double W { set; get; }
+        public override double Area => H * W;
+    }
+
+
+
 
     public class Item
     {
