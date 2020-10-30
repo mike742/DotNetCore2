@@ -1,6 +1,8 @@
 ﻿using System;
-using Cripto;
-using MySql.Data.MySqlClient;
+using System.Linq;
+using System.Xml.Linq;
+using static System.Console;
+//using ;
 
 namespace DotNetCore2
 {
@@ -8,49 +10,57 @@ namespace DotNetCore2
     {
         static void Main(string[] args)
         {
+            var file = @"Students.xml";
 
-            string str = "123456";
-            Console.WriteLine(Cripto.Cripto.toMD5(str));
+            var list = XDocument.Load(file)
+                .Element("Students")
+                .Elements("Student")
+                // .Descendants("Student")
+                .Where(s => (int)s.Element("TotalMarks") > 1010)
+                .Select(s => s.Attribute("Id").Value);
 
-            string cs =
-                @"server=127.0.0.1;userid=root;password=;database=sql_classes";
+            list.ToList().ForEach(s => WriteLine(s));
 
-            using (var conn = new MySqlConnection(cs))
-            {
-                var cmd = new MySqlCommand("SELECT username, password from Passwords", conn);
+            var s = Cripto.Cripto.GenerateSecretString();
 
-                conn.Open();
-                MySqlDataReader rdr = cmd.ExecuteReader();
+            WriteLine(s);
 
-                while (rdr.Read())
-                {
-                    // Console.WriteLine( rdr.GetString(0) + " " + rdr.GetString(1));
+            WriteLine(Cripto.Cripto.SaltAndHash("Pa$$w0rd"));
+            WriteLine(Cripto.Cripto.toMD5("Pa$$w0rd"));
 
-                    Console.WriteLine(
-                            Cripto.Cripto.toMD5(str) == rdr.GetString(1)
-                        );
-                }
+            var xml = XDocument.Load(file);
 
-                Console.WriteLine("Salted hashes: " + Cripto.Cripto.SaltAndHash(str));
-
-                //Console.WriteLine(Cripto.Cripto.GenerateSecretString());
-                
-                
-                Console.WriteLine( (int)'a' );
-                Console.WriteLine( (int)'0');
-                Console.WriteLine( (int)'z');
-
-                string ccn = "1234-5678-9012-3456";
-                string sk = Cripto.Cripto.GenerateSecretString();
-
-                string encCcn = Cripto.Cripto.EncryptString(sk, ccn);
-
-                Console.WriteLine(encCcn);
-
-                Console.WriteLine( Cripto.Cripto.DecryptString(sk, encCcn) );
+            xml.Element("Students").AddFirst(
+                    new XElement("Student", 
+                        new XAttribute("Id", 100),
+                        new XElement("Name", "Todd"),
+                        new XElement("TotalMarks", 5555)
+                    )
+                );
 
 
-            }
+            xml.Element("Students").Elements("Student")
+                .Where(s => s.Attribute("Id").Value == 103.ToString())
+                .FirstOrDefault()
+                .AddBeforeSelf(
+                     new XElement("Student",
+                        new XAttribute("Id", 102.5),
+                        new XElement("Name", "John"),
+                        new XElement("TotalMarks", 123456)
+                    )
+                );
+
+            xml.Element("Students").Elements("Student")
+                .Where(s => s.Attribute("Id").Value == 103.ToString())
+                .FirstOrDefault()
+                .SetElementValue("TotalMarks", 987654321);
+
+            xml.Root.Elements()
+                // .Where(s => s.Attribute("Id").Value == 103.ToString())
+                .Remove();
+
+
+            xml.Save(file);
         }
     }
 }

@@ -8,15 +8,15 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="3.1.9" />
     <PackageReference Include="MySql.Data" Version="8.0.22" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Cripto\Cripto.csproj" />
+    <PackageReference Include="Robertson.DotNetCore2.Cripto" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Menu2.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Students.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

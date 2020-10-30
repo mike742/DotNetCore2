@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Cripto
 {
-    public class Cripto
+    public static class Cripto
     {
 		public static string GenerateSecretString()
 		{
